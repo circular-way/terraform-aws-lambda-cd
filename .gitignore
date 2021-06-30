@@ -1,0 +1,9 @@
+.env
+.npm
+.terraform
+*.log
+*.tsbuildinfo
+build
+dist
+node_modules/
+out

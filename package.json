@@ -1,0 +1,30 @@
+{
+  "name": "@sellalong/terraform-aws-lambda-cd",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Terraform module to remote build lambdas and deploy within the context of a terraform plan/apply",
+  "homepage": "https://github.com/sellalong/terraform-aws-lambda-cd",
+  "bugs": "https://github.com/sellalong/terraform-aws-lambda-cd/issues",
+  "repository": "https://github.com/sellalong/terraform-aws-lambda-cd",
+  "license": "MIT",
+  "author": {
+    "name": "Sellalong Engineers",
+    "email": "engineers@sellalong.com",
+    "url": "https://sellalong.com"
+  },
+  "scripts": {
+    "prepare": "npx --yes husky@6 install",
+    "format": "npx --yes prettier@2 --write . && npm run format:terraform -- -recursive",
+    "format:terraform": "terraform_fmt () { for a in $*; do terraform fmt $a; done }; terraform_fmt",
+    "check:format": "npx --yes prettier@2 --check ."
+  },
+  "lint-staged": {
+    "**/*": "npx --yes prettier@2 --write --ignore-unknown",
+    "*.tf": "npm run format:terraform --",
+    "package.json": "npx --yes sort-package-json@1"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  }
+}
