@@ -1,0 +1,11 @@
+{
+  "name": "@sellalong/lambda-cd-worker",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "author": "",
+  "main": "main.js",
+  "devDependencies": {
+    "aws-sdk": "^2.936.0"
+  }
+}

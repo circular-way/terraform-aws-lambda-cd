@@ -1,0 +1,14 @@
+{
+  "name": "integration_test",
+  "version": "0.1.0",
+  "description": "",
+  "license": "MIT",
+  "author": "",
+  "main": "main.js",
+  "scripts": {
+    "build": "echo \"nothing to build yet\""
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
