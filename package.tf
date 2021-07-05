@@ -19,7 +19,7 @@ resource "aws_s3_bucket_object" "sources" {
   key    = "${var.package_target_s3.prefix}${lower(var.meta_name)}_${data.archive_file.sources[0].output_md5}.sources.zip"
   bucket = var.package_target_s3.bucket
   source = data.archive_file.sources[0].output_path
-  etag   = data.archive_file.sources[0].output_base64sha256
+  etag   = data.archive_file.sources[0].output_md5
   acl    = "private"
 }
 
