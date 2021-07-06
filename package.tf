@@ -30,3 +30,9 @@ data "aws_s3_bucket_object" "existing_sources" {
   key        = var.package_sources_s3.key
   version_id = var.package_sources_s3.version_id
 }
+
+resource "time_static" "package_sources_updated" {
+  triggers = {
+    sources_hash = local.package_sources.etag
+  }
+}

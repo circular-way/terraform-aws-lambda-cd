@@ -10,7 +10,7 @@ data "aws_lambda_invocation" "build" {
 
   # workaround see: https://github.com/hashicorp/terraform-provider-aws/issues/4746
   input = jsonencode({
-    time          = timestamp()
+    time          = time_static.package_sources_updated.rfc3339
     source        = "io.sellalong.lambda-cd-worker"
     "detail-type" = "BUILD"
     detail = {
