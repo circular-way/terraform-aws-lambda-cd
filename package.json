@@ -12,6 +12,9 @@
     "email": "engineers@sellalong.com",
     "url": "https://sellalong.com"
   },
+  "workspaces": [
+    "./modules/lambda-worker/sources/*"
+  ],
   "scripts": {
     "prepare": "npx --yes husky@6 install",
     "format": "npx --yes prettier@2 --write . && npm run format:terraform -- -recursive",

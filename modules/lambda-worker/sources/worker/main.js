@@ -31,7 +31,7 @@ const eventSource = "io.sellalong.lambda-cd-worker"
 /**
  * @typedef {object} WorkerBuildEventS3
  * @property {{bucket: string, key: string, versionId: string|null}} sources
- * @property {{bucket: string, prefix: string|null}} target
+ * @property {{bucket: string, prefix: string}} target
  */
 
 /**
@@ -39,8 +39,7 @@ const eventSource = "io.sellalong.lambda-cd-worker"
  * @returns {event is WorkerEvent}
  */
 function isBuildEvent(event) {
-  /** @type {WorkerEvent} */
-  const e = event
+  const e = /** @type {WorkerEvent} */ (event)
   return (
     e["detail-type"] === "BUILD" &&
     e.source === eventSource &&
@@ -51,7 +50,8 @@ function isBuildEvent(event) {
     typeof e.detail.s3.sources.bucket === "string" &&
     typeof e.detail.s3.sources.key === "string" &&
     typeof e.detail.s3.target === "object" &&
-    typeof e.detail.s3.target.bucket === "string"
+    typeof e.detail.s3.target.bucket === "string" &&
+    typeof e.detail.s3.target.prefix === "string"
   )
 }
 
@@ -85,6 +85,7 @@ async function getExisting(bucket, key) {
  * @param {string} key
  * @param {string|null} versionId
  * @param {string} targetFilePath
+ * @returns {Promise<void>}
  */
 async function s3Download(bucket, key, versionId, targetFilePath) {
   return new Promise((resolve, reject) => {
@@ -208,8 +209,8 @@ module.exports.handler = async function handler(event) {
     },
   })
 
-  proc.child.stdout.pipe(process.stdout)
-  proc.child.stderr.pipe(process.stderr)
+  proc.child.stdout?.pipe(process.stdout)
+  proc.child.stderr?.pipe(process.stderr)
 
   const { stdout } = await proc
   const packagePath = parseBuildScriptOutput(stdout)
