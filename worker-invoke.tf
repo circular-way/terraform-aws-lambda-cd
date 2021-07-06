@@ -17,6 +17,7 @@ data "aws_lambda_invocation" "build" {
 
         target = {
           bucket = var.package_target_s3.bucket
+          dir    = var.package_target_dir
           prefix = var.package_target_s3.prefix
         }
       }

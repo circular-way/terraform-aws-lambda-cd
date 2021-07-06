@@ -54,6 +54,12 @@ variable "meta_name" {
   type        = string
 }
 
+variable "package_target_dir" {
+  description = "Directory relative to the sources path root to package for deployment (eg: \"./dist\")"
+  type        = string
+  default     = "."
+}
+
 variable "package_target_s3" {
   description = "S3 bucket and key prefix for packages and artefacts"
   type = object({

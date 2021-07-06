@@ -14,8 +14,7 @@ cd $BUILD_PATH
 
 eval $BUILD_COMMAND
 
-# cd $BUILD_PATH$DIST_DIR
-
+cd $BUILD_TARGET_DIR
 zip -r $BUILD_TARGET_PATH .
 
 # output json to stdout for reading in the js handler

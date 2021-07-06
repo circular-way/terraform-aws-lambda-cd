@@ -31,7 +31,7 @@ const eventSource = "io.sellalong.lambda-cd-worker"
 /**
  * @typedef {object} WorkerBuildEventS3
  * @property {{bucket: string, key: string, versionId: string|null}} sources
- * @property {{bucket: string, prefix: string}} target
+ * @property {{bucket: string, dir: string, prefix: string}} target
  */
 
 /**
@@ -51,6 +51,7 @@ function isBuildEvent(event) {
     typeof e.detail.s3.sources.key === "string" &&
     typeof e.detail.s3.target === "object" &&
     typeof e.detail.s3.target.bucket === "string" &&
+    typeof e.detail.s3.target.dir === "string" &&
     typeof e.detail.s3.target.prefix === "string"
   )
 }
@@ -202,6 +203,7 @@ module.exports.handler = async function handler(event) {
       BUILD_PATH: localBuildPath,
       BUILD_SOURCE_PATH: localSourcesPath,
       BUILD_TARGET_PATH: localTargetPath,
+      BUILD_TARGET_DIR: target.dir,
 
       ...process.env,
 

@@ -1,14 +1,20 @@
 {
   "name": "integration_test",
   "version": "0.1.0",
-  "description": "",
+  "private": true,
+  "description": "Integration test of terraform-aws-lambda-cd",
   "license": "MIT",
-  "author": "",
+  "author": {
+    "name": "Sellalong Engineers",
+    "email": "engineers@sellalong.com",
+    "url": "https://sellalong.com"
+  },
   "main": "main.js",
   "scripts": {
-    "build": "echo \"nothing to build yet\""
+    "build": "tsc"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.77",
     "typescript": "^4.3.5"
   }
 }

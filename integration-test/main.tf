@@ -40,10 +40,13 @@ module "integration_test" {
 
   meta_name            = "terraform_module_lambda_ci_int_test"
   package_sources_path = "${path.module}/lambda_source"
+  package_target_dir   = "dist"
   package_target_s3 = {
     bucket = aws_s3_bucket.integration_test.bucket
     prefix = "integration_test/"
   }
+
+  worker_lambda_memory_size = 512
 }
 
 resource "aws_s3_bucket" "integration_test" {
