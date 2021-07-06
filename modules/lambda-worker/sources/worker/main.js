@@ -8,7 +8,6 @@ const path = require("path")
 const { promisify } = require("util")
 
 const aws = require("aws-sdk")
-const { on } = require("events")
 const s3 = new aws.S3()
 
 const exec = promisify(cp.exec)
@@ -54,6 +53,31 @@ function isBuildEvent(event) {
     typeof e.detail.s3.target === "object" &&
     typeof e.detail.s3.target.bucket === "string"
   )
+}
+
+/**
+ *
+ * @param {string} bucket
+ * @param {string} key
+ */
+async function getExisting(bucket, key) {
+  try {
+    const response = await s3
+      .headObject({
+        Bucket: bucket,
+        Key: key,
+      })
+      .promise()
+    return {
+      bucket,
+      key,
+      etag: response.ETag,
+      version_id: response.VersionId,
+    }
+  } catch (error) {
+    console.warn(`Existing build not found: ${error}`)
+    return null
+  }
 }
 
 /**
@@ -126,9 +150,14 @@ function parseBuildScriptOutput(stdout) {
 }
 
 /**
+ * @typedef {object} WorkerHandlerOutput
+ * @property {{bucket: string, key: string, etag?: string, version_id?: string}} package_s3 target build artefact details in s3
+ */
+
+/**
  *
  * @param {WorkerEvent} event
- * @returns
+ * @returns {Promise<WorkerHandlerOutput>}
  */
 module.exports.handler = async function handler(event) {
   if (!isBuildEvent(event)) {
@@ -137,6 +166,22 @@ module.exports.handler = async function handler(event) {
 
   const { sources, target } = event.detail.s3
   const filename = path.basename(sources.key, ".sources.zip")
+
+  const targetS3 = {
+    bucket: target.bucket,
+    key: `${target.prefix}${filename}.zip`,
+  }
+
+  const existing = await getExisting(targetS3.bucket, targetS3.key)
+
+  if (existing !== null) {
+    console.log(
+      `Build exists, skipping rebuild: s3://${targetS3.bucket}/${targetS3.key}`
+    )
+    return {
+      package_s3: existing,
+    }
+  }
 
   const seed = Date.now()
   const localBuildPath = `/tmp/build.${seed}/`
@@ -169,11 +214,7 @@ module.exports.handler = async function handler(event) {
   const { stdout } = await proc
   const packagePath = parseBuildScriptOutput(stdout)
 
-  const package_s3 = await s3Upload(
-    packagePath,
-    target.bucket,
-    `${target.prefix}${filename}.zip`
-  )
+  const package_s3 = await s3Upload(packagePath, targetS3.bucket, targetS3.key)
 
   return {
     package_s3,
