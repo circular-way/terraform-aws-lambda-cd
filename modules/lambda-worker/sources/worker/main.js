@@ -61,7 +61,7 @@ function isBuildEvent(event) {
  * @param {string} bucket
  * @param {string} key
  */
-async function getExisting(bucket, key) {
+async function s3HeadObject(bucket, key) {
   try {
     const response = await s3
       .headObject({
@@ -74,6 +74,7 @@ async function getExisting(bucket, key) {
       key,
       etag: response.ETag,
       version_id: response.VersionId,
+      metadata: response.Metadata,
     }
   } catch (error) {
     console.warn(`Existing build not found: ${error}`)
@@ -115,14 +116,16 @@ async function s3Download(bucket, key, versionId, targetFilePath) {
  * @param {string} sourceFilePath
  * @param {string} bucket
  * @param {string} key
+ * @param {Record<string, string>} metadata
  */
-async function s3Upload(sourceFilePath, bucket, key) {
+async function s3Upload(sourceFilePath, bucket, key, metadata) {
   const source = fs.createReadStream(sourceFilePath)
   const response = await s3
     .putObject({
       Bucket: bucket,
       Key: key,
       Body: source,
+      Metadata: metadata,
     })
     .promise()
 
@@ -152,8 +155,28 @@ function parseBuildScriptOutput(stdout) {
 }
 
 /**
+ * @template P
+ * @param {() => Promise<P>} fn
+ * @return {Promise<{elapsed: string, result: P}>}
+ */
+async function action(fn) {
+  console.log(`Starting ${fn.name}`)
+  const start = Date.now()
+  const result = await fn()
+  const elapsed = `${Date.now() - start}ms`
+
+  console.log(`${fn.name} completed in ${elapsed}`)
+
+  return {
+    elapsed,
+    result,
+  }
+}
+
+/**
  * @typedef {object} WorkerHandlerOutput
  * @property {{bucket: string, key: string, etag?: string, version_id?: string}} package_s3 target build artefact details in s3
+ * @property {string} build_time
  */
 
 /**
@@ -174,52 +197,65 @@ module.exports.handler = async function handler(event) {
     key: `${target.prefix}${filename}.zip`,
   }
 
-  const existing = await getExisting(targetS3.bucket, targetS3.key)
-
-  if (existing !== null) {
-    console.log(
-      `Build exists, skipping rebuild: s3://${targetS3.bucket}/${targetS3.key}`
-    )
-    return {
-      package_s3: existing,
-    }
-  }
-
   const seed = Date.now()
   const localBuildPath = `/tmp/build.${seed}/`
   const localSourcesPath = `/tmp/${filename}.sources.${seed}.zip`
   const localTargetPath = `/tmp/${filename}.target.${seed}.zip`
 
-  await s3Download(
-    sources.bucket,
-    sources.key,
-    sources.versionId,
-    localSourcesPath
-  )
-
-  const proc = exec("./build.sh", {
-    env: {
-      BUILD_COMMAND: event.detail.commands.join(";\n"),
-      BUILD_PATH: localBuildPath,
-      BUILD_SOURCE_PATH: localSourcesPath,
-      BUILD_TARGET_PATH: localTargetPath,
-      BUILD_TARGET_DIR: target.dir,
-
-      ...process.env,
-
-      HOME: "/tmp",
-    },
+  const { result: existing } = await action(function getExisting() {
+    return s3HeadObject(targetS3.bucket, targetS3.key)
   })
 
-  proc.child.stdout?.pipe(process.stdout)
-  proc.child.stderr?.pipe(process.stderr)
+  if (existing !== null) {
+    const { metadata, ...package_s3 } = existing
+    console.log(
+      `Build exists, skipping rebuild: s3://${targetS3.bucket}/${targetS3.key}`
+    )
+    return {
+      build_time: metadata?.build_time || "unknown",
+      package_s3,
+    }
+  }
 
-  const { stdout } = await proc
-  const packagePath = parseBuildScriptOutput(stdout)
+  await action(function downloadSources() {
+    return s3Download(
+      sources.bucket,
+      sources.key,
+      sources.versionId,
+      localSourcesPath
+    )
+  })
 
-  const package_s3 = await s3Upload(packagePath, targetS3.bucket, targetS3.key)
+  const { result: packagePath, elapsed: build_time } = await action(
+    async function build() {
+      const proc = exec("./build.sh", {
+        env: {
+          BUILD_COMMAND: event.detail.commands.join(";\n"),
+          BUILD_PATH: localBuildPath,
+          BUILD_SOURCE_PATH: localSourcesPath,
+          BUILD_TARGET_PATH: localTargetPath,
+          BUILD_TARGET_DIR: target.dir,
+
+          ...process.env,
+
+          HOME: "/tmp",
+        },
+      })
+
+      proc.child.stdout?.pipe(process.stdout)
+      proc.child.stderr?.pipe(process.stderr)
+
+      const { stdout } = await proc
+      return parseBuildScriptOutput(stdout)
+    }
+  )
+
+  const { result: package_s3 } = await action(function uploadPackage() {
+    return s3Upload(packagePath, targetS3.bucket, targetS3.key, { build_time })
+  })
 
   return {
+    build_time,
     package_s3,
   }
 }

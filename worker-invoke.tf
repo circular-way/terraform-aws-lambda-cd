@@ -1,3 +1,9 @@
+locals {
+  worker_invoke_result = jsondecode(
+    data.aws_lambda_invocation.build.result
+  )
+}
+
 # sleep 10s after lambda_worker_s3_access policy created due to iam eventual consistency
 resource "time_sleep" "iam_lambda_worker_s3_access" {
   depends_on = [aws_iam_role_policy.lambda_worker_s3_access]

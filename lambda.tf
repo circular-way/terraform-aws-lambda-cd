@@ -11,7 +11,5 @@ module "lambda" {
   lambda_timeout            = var.lambda_timeout
   meta_name                 = var.meta_name
 
-  package_s3 = jsondecode(
-    data.aws_lambda_invocation.build.result
-  ).package_s3
+  package_s3 = local.worker_invoke_result.package_s3
 }

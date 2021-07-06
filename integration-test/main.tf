@@ -49,6 +49,14 @@ module "integration_test" {
   worker_lambda_memory_size = 512
 }
 
+output "from_module" {
+  value = {
+    lambda  = module.integration_test.lambda
+    package = module.integration_test.package
+    worker  = module.integration_test.worker
+  }
+}
+
 resource "aws_s3_bucket" "integration_test" {
   bucket_prefix = "sellalong-tf-aws-lambda-cd-"
   force_destroy = true
