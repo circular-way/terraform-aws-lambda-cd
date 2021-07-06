@@ -10,6 +10,7 @@ output "lambda" {
 output "package" {
   value = {
     build_time = local.worker_invoke_result.build_time
+    logs       = local.worker_invoke_result.logs
     s3         = local.worker_invoke_result.package_s3
   }
 }

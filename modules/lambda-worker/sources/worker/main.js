@@ -154,6 +154,33 @@ function parseBuildScriptOutput(stdout) {
   }
 }
 
+const encode = encodeURIComponent
+const awsEncode = (/** @type {string} */ input) =>
+  encode(input).replace(/%/g, "$")
+
+/**
+ * @param {number} startTime
+ */
+function getLogs(startTime) {
+  const region =
+    process.env.AWS_REGION || process.env.AWS_DEFAULT_REGION || "us-east-1"
+  const group = process.env.AWS_LAMBDA_LOG_GROUP_NAME || ""
+  const stream = process.env.AWS_LAMBDA_LOG_STREAM_NAME || ""
+
+  const console_url =
+    `https://${region}.console.aws.amazon.com/cloudwatch/home?region=${region}#logsV2:log-groups/log-group/` +
+    awsEncode(encode(group)) +
+    "/log-events/" +
+    awsEncode(encode(stream)) +
+    awsEncode(`?start=${encode(new Date(startTime).toISOString())}`)
+
+  return {
+    group: group || "unknown",
+    stream: stream || "unknown",
+    console_url,
+  }
+}
+
 /**
  * @template P
  * @param {() => Promise<P>} fn
@@ -177,6 +204,7 @@ async function action(fn) {
  * @typedef {object} WorkerHandlerOutput
  * @property {{bucket: string, key: string, etag?: string, version_id?: string}} package_s3 target build artefact details in s3
  * @property {string} build_time
+ * @property {{group?: string, stream?: string, console_url: string}} logs
  */
 
 /**
@@ -185,6 +213,7 @@ async function action(fn) {
  * @returns {Promise<WorkerHandlerOutput>}
  */
 module.exports.handler = async function handler(event) {
+  const start = Date.now()
   if (!isBuildEvent(event)) {
     throw new Error(`Unexpected event: ${JSON.stringify(event)}`)
   }
@@ -197,10 +226,9 @@ module.exports.handler = async function handler(event) {
     key: `${target.prefix}${filename}.zip`,
   }
 
-  const seed = Date.now()
-  const localBuildPath = `/tmp/build.${seed}/`
-  const localSourcesPath = `/tmp/${filename}.sources.${seed}.zip`
-  const localTargetPath = `/tmp/${filename}.target.${seed}.zip`
+  const localBuildPath = `/tmp/build.${start}/`
+  const localSourcesPath = `/tmp/${filename}.sources.${start}.zip`
+  const localTargetPath = `/tmp/${filename}.target.${start}.zip`
 
   const { result: existing } = await action(function getExisting() {
     return s3HeadObject(targetS3.bucket, targetS3.key)
@@ -213,6 +241,11 @@ module.exports.handler = async function handler(event) {
     )
     return {
       build_time: metadata?.build_time || "unknown",
+      logs: {
+        group: metadata?.log_group || "unknown",
+        stream: metadata?.log_stream || "unknown",
+        console_url: metadata?.log_console_url || "unknown",
+      },
       package_s3,
     }
   }
@@ -250,12 +283,20 @@ module.exports.handler = async function handler(event) {
     }
   )
 
+  const logs = getLogs(start)
+
   const { result: package_s3 } = await action(function uploadPackage() {
-    return s3Upload(packagePath, targetS3.bucket, targetS3.key, { build_time })
+    return s3Upload(packagePath, targetS3.bucket, targetS3.key, {
+      build_time,
+      log_group: logs.group,
+      log_stream: logs.stream,
+      log_console_url: logs.console_url,
+    })
   })
 
   return {
     build_time,
+    logs,
     package_s3,
   }
 }
