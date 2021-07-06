@@ -49,6 +49,24 @@ module "integration_test" {
   worker_lambda_memory_size = 512
 }
 
+resource "time_static" "main_integration_test_sources_updated" {
+  triggers = {
+    sources_hash = module.integration_test.package.s3.etag
+  }
+}
+
+data "aws_lambda_invocation" "main_integration_test" {
+  function_name = module.integration_test.lambda.function_name
+
+  input = jsonencode({
+    time = time_static.main_integration_test_sources_updated.rfc3339
+  })
+}
+
+output "intgration_test_result" {
+  value = jsondecode(data.aws_lambda_invocation.main_integration_test.result)
+}
+
 output "from_module" {
   value = {
     lambda  = module.integration_test.lambda
