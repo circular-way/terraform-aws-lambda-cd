@@ -9,7 +9,6 @@ module "worker" {
   meta_name          = coalesce(var.worker_lambda_function_name, "worker_${var.meta_name}")
 }
 
-# todo needs a sleep due to eventual consistency
 resource "aws_iam_role_policy" "lambda_worker_s3_access" {
   name = "lambda_worker_s3_access"
   role = module.worker[0].lambda_worker.role

@@ -1,3 +1,10 @@
+# sleep 10s after lambda_worker_s3_access policy created due to iam eventual consistency
+resource "time_sleep" "iam_lambda_worker_s3_access" {
+  depends_on = [aws_iam_role_policy.lambda_worker_s3_access]
+
+  create_duration = "10s"
+}
+
 data "aws_lambda_invocation" "build" {
   function_name = var.worker_lambda_function_name == null ? module.worker[0].lambda_worker.function_name : var.worker_lambda_function_name
 
@@ -25,6 +32,6 @@ data "aws_lambda_invocation" "build" {
   })
 
   depends_on = [
-    aws_iam_role_policy.lambda_worker_s3_access
+    time_sleep.iam_lambda_worker_s3_access
   ]
 }
