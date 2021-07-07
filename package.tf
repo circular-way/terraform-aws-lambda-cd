@@ -23,6 +23,10 @@ resource "aws_s3_bucket_object" "package_sources" {
   acl      = "private"
   tags     = {}
   metadata = {}
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # existing s3 archive of sources
