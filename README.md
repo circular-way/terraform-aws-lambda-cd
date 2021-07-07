@@ -11,44 +11,14 @@
 - Enables a continuous deployment lifecycle with pre and post deploy testing (TODO)
 - Built and tested on [Terraform Cloud](https://www.terraform.io/cloud), but can be used with any terraform runtime (no external dependencies except terraform itself)
 
-## Usage
-
-```hcl
-module "my_lambda" {
-  source = "sellalong/terraform-aws-lambda-cd"
-
-  meta_name            = "my_lambda"
-  package_sources_path = "${path.module}/lambda_source"
-  package_target_dir   = "dist"
-
-  # S3 bucket with versioning required for storage of package artefacts
-  package_target_s3 = {
-    bucket = "my_package_s3_bucket"
-    prefix = "my_lambda/"
-  }
-
-  # Consider allocating more memory/timeout to the worker lambda, as builds may take a while. More memory = more CPU
-  worker_lambda_memory_size = 512
-  worker_lambda_timeout     = 300
-
-  # Can use npm v7 if desired for build
-  worker_lambda_npm_7 = true
-
-  # Customise build commands (defaults below)
-  build_commands = [
-    "npm ci",
-    "npm run build"
-  ]
-}
-```
-
 <!-- BEGIN_TF_DOCS -->
 
-Usage:
+## Usage:
 
 ```hcl
 module "my_lambda" {
-  source = "sellalong/terraform-aws-lambda-cd"
+  source  = "sellalong/lambda-cd/aws"
+  version = "1.0.0"
 
   meta_name            = "my_lambda"
   package_sources_path = "${path.module}/lambda_source"

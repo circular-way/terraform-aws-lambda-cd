@@ -1,9 +1,10 @@
 /**
- * Usage:
+ * ## Usage:
  *
  * ```hcl
  * module "my_lambda" {
- *   source = "sellalong/terraform-aws-lambda-cd"
+ *   source  = "sellalong/lambda-cd/aws"
+ *   version = "1.0.0"
  *
  *   meta_name            = "my_lambda"
  *   package_sources_path = "${path.module}/lambda_source"
