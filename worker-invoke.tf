@@ -1,17 +1,17 @@
 locals {
   worker_invoke_result = jsondecode(
-    data.aws_lambda_invocation.build.result
+    data.aws_lambda_invocation.worker_invoke_build.result
   )
 }
 
-# sleep 10s after lambda_worker_s3_access policy created due to iam eventual consistency
-resource "time_sleep" "iam_lambda_worker_s3_access" {
-  depends_on = [aws_iam_role_policy.lambda_worker_s3_access]
+# sleep 10s after worker_lambda_s3_access policy created due to iam eventual consistency
+resource "time_sleep" "worker_invoke_iam_s3_access" {
+  depends_on = [aws_iam_role_policy.worker_lambda_s3_access]
 
   create_duration = "10s"
 }
 
-data "aws_lambda_invocation" "build" {
+data "aws_lambda_invocation" "worker_invoke_build" {
   function_name = var.worker_lambda_function_name == null ? module.worker[0].lambda_worker.function_name : var.worker_lambda_function_name
 
   # workaround see: https://github.com/hashicorp/terraform-provider-aws/issues/4746
@@ -38,6 +38,6 @@ data "aws_lambda_invocation" "build" {
   })
 
   depends_on = [
-    time_sleep.iam_lambda_worker_s3_access
+    time_sleep.worker_invoke_iam_s3_access
   ]
 }

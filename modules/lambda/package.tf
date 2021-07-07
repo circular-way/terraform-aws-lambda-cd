@@ -2,7 +2,6 @@ locals {
   package_is_local      = var.package_local_path != null
   package_is_local_only = var.package_target_s3 == null && local.package_is_local
   package_is_upload_s3  = var.package_target_s3 != null && local.package_is_local
-  # package_is_existing_s3 = var.package_local_path == null
 
   package_local = {
     filename         = local.package_is_local_only ? data.archive_file.package[0].output_path : null
@@ -13,9 +12,6 @@ locals {
     bucket         = try(aws_s3_bucket_object.package_upload[0].bucket, var.package_s3.bucket, null)
     key            = try(aws_s3_bucket_object.package_upload[0].key, var.package_s3.key, null)
     object_version = try(aws_s3_bucket_object.package_upload[0].version_id, var.package_s3.version_id, null)
-    # bucket         = try(data.aws_s3_bucket_object.existing_package[0].bucket, aws_s3_bucket_object.package_upload[0].bucket, null)
-    # key            = try(data.aws_s3_bucket_object.existing_package[0].key, aws_s3_bucket_object.package_upload[0].key, null)
-    # object_version = try(data.aws_s3_bucket_object.existing_package[0].version_id, aws_s3_bucket_object.package_upload[0].version_id, null)
   }
 }
 
@@ -26,14 +22,6 @@ data "archive_file" "package" {
   source_dir  = var.package_local_path
   output_path = ".terraform/tmp/lambda/${var.meta_name}.zip"
 }
-
-# existing s3 package
-# data "aws_s3_bucket_object" "existing_package" {
-#   count      = local.package_is_existing_s3 ? 1 : 0
-#   bucket     = var.package_s3.bucket
-#   key        = var.package_s3.key
-#   version_id = var.package_s3.version_id
-# }
 
 # upload local package to s3
 resource "aws_s3_bucket_object" "package_upload" {

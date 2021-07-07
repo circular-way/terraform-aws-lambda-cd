@@ -1,6 +1,6 @@
-resource "aws_lambda_function" "this" {
+resource "aws_lambda_function" "lambda" {
   function_name = var.meta_name
-  role          = try(aws_iam_role.lambda[0].arn, var.lambda_role)
+  role          = try(aws_iam_role.iam_lambda[0].arn, var.lambda_role)
 
   filename         = local.package_local.filename
   source_code_hash = local.package_local.source_code_hash

@@ -1,4 +1,4 @@
-resource "aws_iam_role" "lambda" {
+resource "aws_iam_role" "iam_lambda" {
   count = var.lambda_role == null ? 1 : 0
   name  = "lambda_${var.meta_name}"
 
@@ -17,10 +17,10 @@ resource "aws_iam_role" "lambda" {
   })
 }
 
-resource "aws_iam_role_policy" "lambda_runtime" {
+resource "aws_iam_role_policy" "iam_lambda_runtime" {
   count = var.lambda_role == null ? 1 : 0
   name  = "lambda_runtime"
-  role  = aws_iam_role.lambda[0].id
+  role  = aws_iam_role.iam_lambda[0].id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [for v in [
@@ -31,7 +31,7 @@ resource "aws_iam_role_policy" "lambda_runtime" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
-        Resource = "${aws_cloudwatch_log_group.lambda_runtime[0].arn}:*"
+        Resource = "${aws_cloudwatch_log_group.cloudwatch_lambda_runtime[0].arn}:*"
       } : null
     ] : v if v != null]
   })
