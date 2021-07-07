@@ -1,6 +1,6 @@
 {
   "name": "@sellalong/terraform-aws-lambda-cd",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Terraform module to remote build lambdas and deploy within the context of a terraform plan/apply",
   "homepage": "https://github.com/sellalong/terraform-aws-lambda-cd",
