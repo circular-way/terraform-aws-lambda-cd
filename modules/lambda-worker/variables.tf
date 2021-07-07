@@ -11,6 +11,12 @@ variable "lambda_memory_size" {
   default     = 128
 }
 
+variable "lambda_npm_7" {
+  description = "Enable npm 7 on the worker lambda (installed as a layer)"
+  type        = bool
+  default     = false
+}
+
 variable "lambda_role" {
   type    = string
   default = null

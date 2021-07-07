@@ -107,6 +107,12 @@ variable "worker_lambda_memory_size" {
   default     = 128
 }
 
+variable "worker_lambda_npm_7" {
+  description = "Enable npm 7 on the worker lambda (installed as a layer)"
+  type        = bool
+  default     = false
+}
+
 variable "worker_lambda_role" {
   description = "Existing iam role (name not arn) to allocate to the worker lambda at runtime"
   type        = string

@@ -47,6 +47,13 @@ module "integration_test" {
   }
 
   worker_lambda_memory_size = 512
+  worker_lambda_npm_7       = true
+
+  build_commands = [
+    "npm --version",
+    "npm ci",
+    "npm run build"
+  ]
 }
 
 resource "time_static" "main_integration_test_sources_updated" {

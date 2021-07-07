@@ -4,6 +4,7 @@ module "worker" {
 
   lambda_layers      = var.worker_lambda_layers
   lambda_memory_size = var.worker_lambda_memory_size
+  lambda_npm_7       = var.worker_lambda_npm_7
   lambda_role        = var.worker_lambda_role
   lambda_timeout     = var.worker_lambda_timeout
   meta_name          = coalesce(var.worker_lambda_function_name, "worker_${var.meta_name}")

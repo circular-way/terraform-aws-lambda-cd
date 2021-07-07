@@ -272,6 +272,9 @@ module.exports.handler = async function handler(event) {
           ...process.env,
 
           HOME: "/tmp",
+
+          // Prioritise additional node cli tools when added as a layer(s)
+          PATH: `/opt/nodejs/node_modules/.bin:${process.env.PATH}`,
         },
       })
 
