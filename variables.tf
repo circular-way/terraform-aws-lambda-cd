@@ -1,13 +1,14 @@
 variable "build_commands" {
-  description = "Commands to run remotely on the worker lambda during build phase, in the directory root of $${var.package_source_path}"
+  description = "Commands to run remotely on the worker lambda during build phase, in the directory root of `$${var.package_source_path}`"
   type        = list(string)
   default     = ["npm ci", "npm run build"]
 }
 
 
 variable "cloudwatch_logs_enable" {
-  type    = bool
-  default = true
+  description = "Enable logging to cloudwatch logs for the built lambda"
+  type        = bool
+  default     = true
 }
 
 variable "cloudwatch_logs_retention" {
@@ -18,13 +19,15 @@ variable "cloudwatch_logs_retention" {
 
 
 variable "lambda_handler" {
-  type    = string
-  default = "main.handler"
+  description = "Handler spec for the built lambda"
+  type        = string
+  default     = "main.handler"
 }
 
 variable "lambda_layers" {
-  type    = list(string)
-  default = []
+  description = "Lambda layers for the built lambda"
+  type        = list(string)
+  default     = []
 }
 
 variable "lambda_memory_size" {
@@ -40,13 +43,15 @@ variable "lambda_role" {
 }
 
 variable "lambda_runtime" {
-  type    = string
-  default = "nodejs14.x"
+  description = "Runtime to use for the built lambda"
+  type        = string
+  default     = "nodejs14.x"
 }
 
 variable "lambda_timeout" {
-  type    = number
-  default = 3
+  description = "Timeout in seconds for the runtime of the built lambda"
+  type        = number
+  default     = 3
 }
 
 variable "meta_name" {
@@ -120,6 +125,7 @@ variable "worker_lambda_role" {
 }
 
 variable "worker_lambda_timeout" {
-  type    = number
-  default = 180
+  description = "Timeout in seconds for the runtime of an invocation in the worker lambda"
+  type        = number
+  default     = 180
 }

@@ -16,6 +16,7 @@
     "./modules/lambda-worker/sources/*"
   ],
   "scripts": {
+    "docs": "terraform-docs markdown table --output-file README.md .; npx --yes prettier@2 --write README.md",
     "prepare": "npx --yes husky@6 install",
     "format": "npx --yes prettier@2 --write . && npm run format:terraform -- -recursive",
     "format:terraform": "terraform_fmt () { for a in $*; do terraform fmt $a; done }; terraform_fmt",
