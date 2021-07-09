@@ -29,9 +29,11 @@ data "aws_lambda_invocation" "worker_invoke_build" {
         }
 
         target = {
-          bucket = var.package_target_s3.bucket
-          dir    = var.package_target_dir
-          prefix = var.package_target_s3.prefix
+          bucket  = var.package_target_s3.bucket
+          exclude = var.package_target_exclude
+          dir     = var.package_target_dir
+          include = var.package_target_include
+          prefix  = var.package_target_s3.prefix
         }
       }
     }

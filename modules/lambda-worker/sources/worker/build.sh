@@ -15,7 +15,7 @@ cd $BUILD_PATH
 eval $BUILD_COMMAND
 
 cd $BUILD_TARGET_DIR
-zip -r $BUILD_TARGET_PATH .
+zip -9ry $BUILD_TARGET_PATH $BUILD_TARGET_FILES $BUILD_TARGET_EXCLUDE
 
 # output json to stdout for reading in the js handler
 echo '{"packagePath": "'$BUILD_TARGET_PATH'"}' >&3

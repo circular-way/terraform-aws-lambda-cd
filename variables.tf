@@ -65,6 +65,18 @@ variable "package_target_dir" {
   default     = "."
 }
 
+variable "package_target_include" {
+  description = "Files/directories relative to `$${var.package_target_dir}` to include in the package zip (zip compatible wildcards/pattern matching accepted, see: https://linux.die.net/man/1/zip)"
+  type        = list(string)
+  default     = ["."]
+}
+
+variable "package_target_exclude" {
+  description = "Files/directories relative to `$${var.package_target_dir}` to exclude from the package zip (zip compatible wildcards/pattern matching accepted, see: https://linux.die.net/man/1/zip)"
+  type        = list(string)
+  default     = []
+}
+
 variable "package_target_s3" {
   description = "S3 bucket and key prefix for packages and artefacts"
   type = object({

@@ -54,6 +54,9 @@ module "integration_test" {
     "npm ci",
     "npm run build"
   ]
+
+  package_target_include = ["*.js", "*.json"]
+  package_target_exclude = ["tsconfig.json", "*-lock.json"]
 }
 
 resource "time_static" "main_integration_test_sources_updated" {
