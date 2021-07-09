@@ -4,6 +4,11 @@ variable "build_commands" {
   default     = ["npm ci", "npm run build"]
 }
 
+variable "build_environment_variables" {
+  description = "A map that defines environment variables to use in the build process while building the lambda in the worker."
+  type        = map(string)
+  default     = {}
+}
 
 variable "cloudwatch_logs_enable" {
   description = "Enable logging to cloudwatch logs for the built lambda"

@@ -60,7 +60,11 @@ module "integration_test" {
     "npm run build"
   ]
 
-  package_target_include = ["*.js", "*.json"]
+  build_environment_variables = {
+    RUNNER = "integration_test"
+  }
+
+  package_target_include = ["*.js", "*.json", "build.txt"]
   package_target_exclude = ["tsconfig.json", "*-lock.json"]
 }
 

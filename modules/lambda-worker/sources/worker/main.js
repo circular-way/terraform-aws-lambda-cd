@@ -25,6 +25,7 @@ const eventSource = "io.sellalong.lambda-cd-worker"
 /**
  * @typedef {object} WorkerBuildEvent
  * @property {string[]} commands
+ * @property {Record<string, string>} environment
  * @property {WorkerBuildEventS3} s3
  */
 
@@ -45,6 +46,7 @@ function isBuildEvent(event) {
     e.source === eventSource &&
     typeof e.detail === "object" &&
     Array.isArray(e.detail.commands) &&
+    typeof e.detail.environment === "object" &&
     typeof e.detail.s3 === "object" &&
     typeof e.detail.s3.sources === "object" &&
     typeof e.detail.s3.sources.bucket === "string" &&
@@ -280,6 +282,8 @@ module.exports.handler = async function handler(event) {
 
           // Prioritise additional node cli tools when added as a layer(s)
           PATH: `/opt/nodejs/node_modules/.bin:${process.env.PATH}`,
+
+          ...event.detail.environment,
         },
       })
 

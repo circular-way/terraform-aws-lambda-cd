@@ -11,6 +11,7 @@
   },
   "main": "main.js",
   "scripts": {
+    "prebuild": "mkdir -p dist && echo $RUNNER > dist/build.txt",
     "build": "tsc && cp *.json ./dist"
   },
   "devDependencies": {

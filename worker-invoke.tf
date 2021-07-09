@@ -20,7 +20,8 @@ data "aws_lambda_invocation" "worker_invoke_build" {
     source        = "io.sellalong.lambda-cd-worker"
     "detail-type" = "BUILD"
     detail = {
-      commands = var.build_commands
+      commands    = var.build_commands
+      environment = var.build_environment_variables
       s3 = {
         sources = {
           bucket    = local.package_sources.bucket
