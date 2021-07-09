@@ -38,7 +38,12 @@ variable "aws_provider_external_id" {
 module "integration_test" {
   source = "./.."
 
-  meta_name            = "terraform_module_lambda_ci_int_test"
+  meta_name = "terraform_module_lambda_ci_int_test"
+
+  lambda_environment_variables = {
+    NODE_ENV = "production"
+  }
+
   package_sources_path = "${path.module}/lambda_source"
   package_target_dir   = "dist"
   package_target_s3 = {

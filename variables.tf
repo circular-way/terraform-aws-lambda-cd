@@ -17,6 +17,11 @@ variable "cloudwatch_logs_retention" {
   default     = 7
 }
 
+variable "lambda_environment_variables" {
+  description = "A map that defines environment variables for the built lambda."
+  type        = map(string)
+  default     = {}
+}
 
 variable "lambda_handler" {
   description = "Handler spec for the built lambda"
