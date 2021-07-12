@@ -17,6 +17,6 @@ zip=$(dirname "$0")/vendor/zip-$platform-$cpu
 find . -exec touch -t 204901010000 {} +
 
 mkdir -p $(dirname $output)
-$zip -9ry $@
+$zip -9ry "$@"
 
 echo '{"outputFile": "'$output'"}' >&3
