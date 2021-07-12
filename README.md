@@ -11,6 +11,13 @@
 - Enables a continuous deployment lifecycle with pre and post deploy testing (TODO)
 - Built and tested on [Terraform Cloud](https://www.terraform.io/cloud), but can be used with any terraform runtime (no external dependencies except terraform itself)
 
+## Known issues / quirks
+
+- Only supports nodejs v14.x at this time. If you'd like to use this module with another runtime, please raise an issue or a PR.
+- A lambda runtime container only has 512MB of space available to write to the `/tmp` directory mount. This module downloads, extracts, and runs build commands all within the `/tmp` directory, so your build processes, source sizes, and dependencies (and their caches) need to fit in this restriction. Builds are cleaned pre and post every build process, and free space is logged to assist in debugging.
+- Cannot install with `npm install --global` due to write permissions. If a global build-time dependency is needed for your project, consider moving it to your project scope, running it with npx, or installing as a lambda layer
+- Due to current limitations in the aws terraform provider, the lambda invocation datasource will invoke during a plan when there are no code changes to the lambda. The worker will detect a built package in the s3 bucket you're using, and exit quickly, however this will result in a billed invocation of <200ms. Awaiting PR here for the fix: https://github.com/hashicorp/terraform-provider-aws/pull/19488
+
 <!-- BEGIN_TF_DOCS -->
 
 ## Usage:
@@ -122,9 +129,3 @@ module "my_lambda" {
 | <a name="output_worker"></a> [worker](#output_worker)    | Outputs a map with the worker lambda's `function_name`                                    |
 
 <!-- END_TF_DOCS -->
-
-## Known issues / quirks
-
-- Only supports nodejs v14.x at this time. If you'd like to use this module with another runtime, please raise an issue or a PR.
-- Cannot install with `npm install --global` due to write permissions. If a global build-time dependency is needed for your project, consider moving it to your project scope, running it with npx, or installing as a lambda layer
-- Due to current limitations in the aws terraform provider, the lambda invocation datasource will invoke during a plan when there are no code changes to the lambda. The worker will detect a built package in the s3 bucket you're using, and exit quickly, however this will result in a billed invocation of <200ms. Awaiting PR here for the fix: https://github.com/hashicorp/terraform-provider-aws/pull/19488
