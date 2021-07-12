@@ -11,6 +11,7 @@ const aws = require("aws-sdk")
 const s3 = new aws.S3()
 
 const exec = promisify(cp.exec)
+const unlink = promisify(fs.unlink)
 
 const eventSource = "io.sellalong.lambda-cd-worker"
 
@@ -231,8 +232,8 @@ module.exports.handler = async function handler(event) {
   }
 
   const localBuildPath = `/tmp/build.${start}/`
-  const localSourcesPath = `/tmp/${filename}.sources.${start}.zip`
-  const localTargetPath = `/tmp/${filename}.target.${start}.zip`
+  const localSourcesPath = `/tmp/build.sources.${start}.zip`
+  const localTargetPath = `/tmp/build.target.${start}.zip`
 
   const { result: existing } = await action(function getExisting() {
     return s3HeadObject(targetS3.bucket, targetS3.key)
@@ -253,6 +254,9 @@ module.exports.handler = async function handler(event) {
       package_s3,
     }
   }
+
+  // clean anything from old builds
+  await exec("rm -rf /tmp/build*")
 
   await action(function downloadSources() {
     return s3Download(
@@ -305,6 +309,8 @@ module.exports.handler = async function handler(event) {
       log_console_url: logs.console_url,
     })
   })
+
+  await unlink(packagePath)
 
   return {
     build_time,
