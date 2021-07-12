@@ -289,6 +289,7 @@ module.exports.handler = async function handler(event) {
 
           ...event.detail.environment,
         },
+        maxBuffer: 1024 * 1024 * 10, // 10MB
       })
 
       proc.child.stdout?.pipe(process.stdout)
