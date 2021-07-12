@@ -256,7 +256,7 @@ module.exports.handler = async function handler(event) {
   }
 
   // clean anything from old builds
-  await exec("rm -rf /tmp/build*")
+  await exec("rm -rf /tmp/build* /tmp/home")
 
   await action(function downloadSources() {
     return s3Download(
@@ -282,7 +282,7 @@ module.exports.handler = async function handler(event) {
 
           ...process.env,
 
-          HOME: "/tmp",
+          HOME: "/tmp/home",
 
           // Prioritise additional node cli tools when added as a layer(s)
           PATH: `/opt/nodejs/node_modules/.bin:${process.env.PATH}`,

@@ -7,7 +7,7 @@ exec 1>&2
 
 set -ex
 
-mkdir -p $BUILD_PATH
+mkdir -p $BUILD_PATH $HOME
 unzip $BUILD_SOURCE_PATH -d $BUILD_PATH
 rm $BUILD_SOURCE_PATH
 
