@@ -1,5 +1,6 @@
 module "lambda" {
   source = "./modules/lambda"
+  count  = var.lambda_create ? 1 : 0
 
   cloudwatch_logs_enable       = var.cloudwatch_logs_enable
   cloudwatch_logs_retention    = var.cloudwatch_logs_retention

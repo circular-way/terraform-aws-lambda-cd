@@ -22,6 +22,12 @@ variable "cloudwatch_logs_retention" {
   default     = 7
 }
 
+variable "lambda_create" {
+  description = "Create a target lambda for the build package created on the worker. Disable to handle build artefacts differently, eg: static website on s3"
+  type        = bool
+  default     = true
+}
+
 variable "lambda_environment_variables" {
   description = "A map that defines environment variables for the built lambda."
   type        = map(string)

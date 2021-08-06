@@ -1,10 +1,10 @@
 output "lambda" {
   description = "Outputs a map with the built lambda's `arn`, `function_name`, `last_modified`, and `role`"
   value = {
-    arn           = module.lambda.lambda.arn
-    function_name = module.lambda.lambda.function_name
-    last_modified = module.lambda.lambda.last_modified
-    role          = module.lambda.lambda.role
+    arn           = var.lambda_create ? module.lambda[0].lambda.arn : null
+    function_name = var.lambda_create ? module.lambda[0].lambda.function_name : null
+    last_modified = var.lambda_create ? module.lambda[0].lambda.last_modified : null
+    role          = var.lambda_create ? module.lambda[0].lambda.role : null
   }
 }
 
