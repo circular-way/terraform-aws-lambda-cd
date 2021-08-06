@@ -1,6 +1,6 @@
 locals {
   package_output_path = data.external.package_archive.result.outputFile
-  package_archive_md5 = filemd5(local.package_output_path)
+  package_archive_md5 = fileexists(local.package_output_path) ? filemd5(local.package_output_path) : null
 }
 
 data "external" "package_archive" {
