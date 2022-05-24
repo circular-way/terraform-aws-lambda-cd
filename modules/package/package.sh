@@ -8,6 +8,7 @@ exec 1>&2
 set -ex
 
 output=$1
+relative_output=$2
 
 platform=$(uname -s | tr '[:upper:]' '[:lower:]')
 cpu=$(uname -m)
@@ -19,4 +20,4 @@ find . -exec touch -t 204901010000 {} +
 mkdir -p $(dirname $output)
 $zip -9Dry "$@"
 
-echo '{"outputFile": "'$output'"}' >&3
+echo '{"outputFile": "'$relative_output'"}' >&3

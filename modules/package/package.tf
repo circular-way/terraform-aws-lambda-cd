@@ -9,6 +9,7 @@ data "external" "package_archive" {
       "bash",
       abspath("${path.module}/package.sh"),
       abspath(var.target_path),
+      var.target_path,
     ],
     var.target_include,
     length(var.target_exclude) > 0 ? ["-x"] : [],
